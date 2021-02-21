@@ -11,6 +11,8 @@ class Post extends Model
     use HasFactory;
     use Sluggable;
 
+    protected $fillable = ['user_id', 'body', 'title', 'image'];
+
     public function sluggable(): array
     {
         return [
@@ -20,4 +22,16 @@ class Post extends Model
             ]
         ];
     }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function getGetExcerptAttribute()
+    {
+        return substr($this->body, 0, 140);
+    }
+
+
 }
