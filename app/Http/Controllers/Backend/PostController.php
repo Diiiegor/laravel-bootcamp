@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Backend;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\PostRequest;
 use App\Models\Post;
-use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class PostController extends Controller
 {
@@ -42,8 +42,8 @@ class PostController extends Controller
                 'user_id' => auth()->user()->id,
             ] + $request->all());
 
-        if ($request->hasFile('file')) {
-            $post->image = $request->file('file')->store('posts', 'public');
+        if ($request->hasFile('image')) {
+            $post->image = $request->file('image')->store('posts', 'public');
             $post->save();
         }
         return back()->with('status','Creado con exito');
@@ -71,9 +71,18 @@ class PostController extends Controller
      * @param \App\Models\Post $post
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Post $post)
+    public function update(PostRequest $request, Post $post)
     {
-        //
+        $post->update($request->all());
+
+        if ($request->hasFile('image')) {
+            Storage::disk('public')->delete($post->image);
+            $post->image = $request->file('image')->store('posts', 'public');
+            $post->save();
+        }
+
+        return back()->with('status','Actualizado con exito');
+
     }
 
     /**
@@ -84,6 +93,8 @@ class PostController extends Controller
      */
     public function destroy(Post $post)
     {
-        //
+        Storage::disk('public')->delete($post->image);
+        $post->delete();
+        return  back()->with('status','Eliminado con exito');
     }
 }

@@ -11,7 +11,7 @@ class Post extends Model
     use HasFactory;
     use Sluggable;
 
-    protected $fillable = ['user_id', 'body', 'title', 'image'];
+    protected $fillable = ['user_id', 'body', 'title', 'image','iframe'];
 
     public function sluggable(): array
     {
@@ -33,5 +33,11 @@ class Post extends Model
         return substr($this->body, 0, 140);
     }
 
+    public function getGetImageAttribute()
+    {
+        if($this->image){
+            return url("storage/$this->image");
+        }
+    }
 
 }
